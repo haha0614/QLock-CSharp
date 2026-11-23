@@ -33,24 +33,29 @@ jobs:
         shell: pwsh
         run: ./tools/pack.ps1
 
+      - name: Release notes from CHANGELOG
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME -replace '^v', ''
+          $out = New-Object System.Collections.Generic.List[string]
+          $in = $false
+          foreach ($line in Get-Content CHANGELOG.md) {
+            if ($line -match '^## ') {
+              if ($in) { break }
+              if ($line -match [regex]::Escape($tag)) { $in = $true; continue }
+            } elseif ($in) {
+              $out.Add($line)
+            }
+          }
+          $text = ($out -join [Environment]::NewLine).Trim()
+          if (-not $text) { $text = "QLock $env:GITHUB_REF_NAME" }
+          Set-Content -Path release-notes.md -Value $text -Encoding utf8
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           fail_on_unmatched_files: true
+          body_path: release-notes.md
           files: |
             dist/QLock.exe
             dist/SHA256SUMS.txt
-          body: |
-            QLock 0.3.0
-
-            - `QLock.exe`：单文件，双击运行，不需要管理员权限
-            - `SHA256SUMS.txt`：校验用，`Get-FileHash QLock.exe -Algorithm SHA256` 对照即可
-
-            这一版是 WPF 实现的最后一个版本。之后主分支改用 C++ 原生直绘重写，
-            这份 WPF 源码留在仓库的 `wpf` 分支，需要旧版时可以从那里取。
-
-            几点说明：
-
-            - 这是软锁，`Ctrl+Alt+Del` 能绕过（安全界面里可以直接结束进程）
-            - 未签名，SmartScreen 会提示"未知发布者"，不放心就对一下哈希
-            - 想彻底替代系统锁屏，还得在 Windows 里关掉登录、屏保、唤醒时的锁屏，见 README
