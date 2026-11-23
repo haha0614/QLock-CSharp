@@ -40,8 +40,8 @@ namespace QLock
     {
         public const string ExeAssetName = "QLock.exe";
         public const string SumsAssetName = "SHA256SUMS.txt";
-        const string DefaultApiUrl = "https://api.github.com/repos/haha0614/QLock/releases/latest";
-        const string DefaultSumsUrl = "https://github.com/haha0614/QLock/releases/latest/download/SHA256SUMS.txt";
+        const string DefaultApiUrl = "https://api.github.com/repos/haha0614/QLock-CSharp/releases/latest";
+        const string DefaultSumsUrl = "https://github.com/haha0614/QLock-CSharp/releases/latest/download/SHA256SUMS.txt";
         const string UserAgent = "QLock-Updater";
 
         public static string ApiUrl()
@@ -103,7 +103,7 @@ namespace QLock
         {
             ReleaseAsset asset = info.Find(ExeAssetName);
             if (asset != null && !string.IsNullOrEmpty(asset.Url)) return asset.Url;
-            return "https://github.com/haha0614/QLock/releases/latest/download/" + ExeAssetName;
+            return "https://github.com/haha0614/QLock-CSharp/releases/latest/download/" + ExeAssetName;
         }
 
         public static string SumsDownloadUrl(ReleaseInfo info)
